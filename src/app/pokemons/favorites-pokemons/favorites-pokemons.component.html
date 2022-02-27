@@ -1,0 +1,108 @@
+<div class="row gutter-t gutter-b p-5 h-limit ">
+    <div class="card card-custom shadow">
+        <div class="card-header mt-4 mx-3 header-color bg-dark shadow-custom-1">
+            <div class="my-3 d-flex flex-wrap  justify-content-between">
+                <div class="card-title align-items-center mx-5">
+                    <i class="flaticon-etiqueta icon-2x text-primary mr-3"></i>
+                    <h2 class="poke-text m-0 title-text"><img src="assets/svg/pokemon-23.svg" alt="" class="img-fluid">
+                    </h2>
+                    <div class="logo-poke">
+                        <div class="pokeball">
+                            <div class="pokeball__button"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-toolbar m-auto px-custom mx-5">
+                    <button [routerLink]="['/']" type="button"
+                        class="btn btn-outline-warning shadow-custom-1 p-15px">
+                        Lista de Pokémons
+                    </button>
+                </div>
+                
+            </div>
+            <div class="row">
+                <div class="col-md-8">
+                    <div class="input-group ms-5 imput-m400">
+                        <input class="form-control search-bar" type="text" placeholder="Busca un Pokémon" aria-label="Search" [(ngModel)]="searchKey" (keyup.enter)="searchOn()">
+                        <div class="input-group-append ">
+                            <button type="button"
+                            class="btn btn-outline-warning shadow-custom-1 pl-3" (click)="searchOn()">
+            
+                                BUSCAR
+                            </button>
+                            
+                        </div>
+                    </div>
+                </div>
+                <br>
+                <br>
+                <br>
+            </div>
+        </div>
+        <div class="card-body py-0">
+            <div class="table-responsive">
+                <table class="table table-striped mt-3 table-vertical-center">
+                    <thead class="table-dark">
+                        <tr class="">
+                            <th class="text-center ">Secuencia</th>
+                            <th class="text-center">Nombre</th>
+                            <th class="text-center">Alias</th>
+                            <th class="text-center">Fecha</th>
+                            <th class="text-center">Acciones</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        <tr class="align-middle" *ngFor="let pokemon of (favorites | paginate: { itemsPerPage: 10, currentPage: p }); let i = index">
+                            <td class="text-center text-secondary h5"> {{i}}</td>
+                            <td class="text-center text-secondary h5">{{pokemon.name}}</td>
+                            <td class="text-center text-secondary h5">{{pokemon.alias}}</td>
+                            <td class="text-center text-secondary h5">{{pokemon.createdAt | date}}</td>
+                            <td class="d-flex justify-content-center">
+                                <div class="d-flex gap-2 justify-content-center">
+                                    <a  (click)="getFavorite(pokemon)" type="button" class="icon-actions btn btn-warning" data-bs-toggle="modal" data-bs-target="#editFavoritePokemon">
+                                        <i class="uil uil-edit-alt"></i>
+                                    </a>
+                                    <a (click)="deleteFavorite(pokemon)" type="button" class="icon-actions btn btn-danger " data-bs-toggle="tooltip"
+                                        data-bs-placement="top" title="Eliminar">
+                                        <i class="uil uil-trash"></i>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div class="d-flex justify-content-end align-items-center flex-wrap">
+                    <pagination-controls previousLabel="<<"
+                    nextLabel=">>" (pageChange)="p = $event"></pagination-controls>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="editFavoritePokemon" tabindex="-1" aria-labelledby="exampleModalLabel"
+aria-hidden="true">
+<div class="modal-dialog">
+    <div class="modal-content">
+        <div class="modal-header bg-dark">
+            <h5 class="modal-title text-white m-0 title-text fs-3" id="exampleModalLabel">Edita el alias de
+                {{favoriteForm.value.name}}</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal"
+                aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+            <form [formGroup]="favoriteForm">
+                <label for="aliasInput" class="form-label">Digita el nuevo alias</label>
+                <input class="form-control" formControlName="alias" id="aliasInput"
+                    placeholder="Alias..." type="text">
+                    <span *ngIf="isInvalid" class="font-weight-bold text-danger">Este campo es obligatorio</span>
+            </form>
+        </div>
+        <div class="modal-footer">
+            <button id="btn-close-model" type="button" class="btn btn-secondary" data-bs-dismiss="modal" (click)="resetForm()">Cerrar</button>
+            <button [disabled]="favoriteForm.invalid" type="button" class="btn btn-danger" (click)="editFavoriteAlias()" >Guardar cambios</button>
+        </div>
+        
+    </div>
+</div>
+</div>

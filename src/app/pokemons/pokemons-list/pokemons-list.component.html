@@ -1,0 +1,108 @@
+<div class="row gutter-t gutter-b p-5 h-limit">
+    <div class="card card-custom shadow-custom-1">
+        <div class="card-header mt-4 mx-3 header-color bg-dark shadow-custom-1">
+            <div class="my-3 d-flex flex-wrap  justify-content-between">
+                <div class="card-title align-items-center mx-5">
+                    <i class="flaticon-etiqueta icon-2x text-primary mr-3"></i>
+                    <h2 class="poke-text m-0 title-text"><img src="assets/svg/pokemon-23.svg" alt="" class="img-fluid">
+                    </h2>
+                    <div class="logo-poke">
+                        <div class="pokeball">
+                            <div class="pokeball__button"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-toolbar m-auto px-custom mx-5">
+                    <button [routerLink]="['/favorites']" type="button"
+                        class="btn btn-outline-danger shadow-custom-1 p-15px">
+                        Lista de favoritos
+                    </button>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-8">
+                    <div class="input-group ms-5 imput-m400">
+                        <input class="form-control search-bar" type="text" placeholder="Busca un Pokémon" aria-label="Search" [(ngModel)]="searchKey" (keyup.enter)="searchOn()">
+                        <div class="input-group-append ">
+                            <button type="button"
+                            class="btn btn-outline-danger shadow-custom-1 pl-3" (click)="searchOn()">
+            
+                                BUSCAR
+                            </button>
+                            
+                        </div>
+                    </div>
+                </div>
+                <br>
+                <br>
+                <br>
+            </div>
+        </div>
+        <div class="card-body py-0">
+            <div class="table-responsive">
+                <table class="table table-striped mt-3 table-vertical-center">
+                    <thead class="table-dark">
+                        <tr class="align-middle">
+                            <th class="text-center h4 ">Secuencia</th>
+                            <th class="text-center h4 ">Nombre</th>
+                            <th class="text-center h4 ">Capturar</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        <tr class="align-middle" *ngFor="let pokemon of (pokemons | paginate: { itemsPerPage: 10, currentPage: p }); let i = index">
+                            <td class="text-center text-secondary h5">{{i}}</td>
+                            <td class="text-center text-secondary h5 ">{{pokemon.name}}</td>
+                            <td class="d-flex justify-content-center">
+                                <a (click)="setFavorite(pokemon)" *ngIf="!pokemon.isFavorite" type="button" class="icon-pk" data-bs-toggle="modal" data-bs-target="#addFavoritePokemon">
+                                    <div class="pokeball2">
+                                        <div class="pokeball__button2 " data-bs-toggle="tooltip" data-bs-placement="top"
+                                        title="Captura al Pokémon"></div>
+                                    </div>
+                                </a>
+                                <a (click)="deleteFavorite(pokemon)" *ngIf="pokemon.isFavorite" type="button" class="icon-pk" data-bs-toggle="tooltip" data-bs-placement="top"
+                                    title="Libera al Pokémon">
+                                    <div class="pokeball2 pokeball2-active">
+                                        <div class=" pokeball__button2 "></div>
+                                    </div>
+                                </a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+
+              
+                <div class="d-flex justify-content-end align-items-center flex-wrap">
+                    <pagination-controls previousLabel="<<"
+                    nextLabel=">>" (pageChange)="p = $event"></pagination-controls>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="addFavoritePokemon" tabindex="-1" aria-labelledby="exampleModalLabel"
+aria-hidden="true">
+<div class="modal-dialog">
+    <div class="modal-content">
+        <div class="modal-header bg-dark">
+            <h5 class="modal-title text-white m-0 title-text fs-3" id="exampleModalLabel">Atrapa a
+                {{favoriteForm.value.name}}</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal"
+                aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+            <form [formGroup]="favoriteForm">
+                <label for="aliasInput" class="form-label">Guardalo con un alias</label>
+                <input class="form-control" formControlName="alias" id="aliasInput"
+                    placeholder="Alias..." type="text">
+                    <span *ngIf="isInvalid" class="font-weight-bold text-danger">Este campo es obligatorio</span>
+            </form>
+        </div>
+        <div class="modal-footer">
+            <button id="btn-close-model" type="button" class="btn btn-secondary" data-bs-dismiss="modal" (click)="resetForm()">Cerrar</button>
+            <button [disabled]="favoriteForm.invalid"  type="button" class="btn btn-danger" (click)="saveFavorite()">Guardar Favorito</button>
+        </div>
+    </div>
+</div>
+</div>

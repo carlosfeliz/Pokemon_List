@@ -1,27 +1,81 @@
-# PokeList
+# Poke List - Documentación del Proyecto
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 11.2.1.
+## 📖 Descripción General
+Este es un proyecto de portafolio desarrollado en **Angular** que permite a los usuarios explorar una lista completa de Pokémon y gestionar una lista personalizada de favoritos. La aplicación consume datos de la API pública de Pokémon (PokeAPI) y ofrece funcionalidades para agregar, editar (asignar alias) y eliminar Pokémon de una lista de favoritos, persistiendo estos datos durante la sesión del usuario.
 
-## Development server
+## 🚀 Características Principales
+- **Listado de Pokémon:** Visualización de una lista paginada de Pokémon obtenida de una API externa.
+- **Gestión de Favoritos:**
+  - Agregar Pokémon a favoritos.
+  - Asignar y editar alias personalizados para los favoritos.
+  - Eliminar Pokémon de la lista.
+- **Persistencia de Datos:** Uso de `sessionStorage` para mantener los favoritos mientras el navegador está abierto.
+- **Paginación:** Navegación eficiente a través de la gran cantidad de registros utilizando `ngx-pagination`.
 
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The app will automatically reload if you change any of the source files.
+## 🛠️ Tecnologías y Herramientas Utilizadas
+El proyecto está construido sobre un stack moderno de desarrollo web:
 
-## Code scaffolding
+- **Angular (v11):** Framework principal para la estructura SPA (Single Page Application).
+- **TypeScript:** Lenguaje principal para la lógica de negocio, ofreciendo tipado estático y mayor robustez.
+- **RxJS:** Manejo de flujos de datos asíncronos (Observables), especialmente para las peticiones HTTP.
+- **HTML5 & CSS3:** Maquetación y estilos de la interfaz de usuario.
+- **ngx-pagination:** Librería externa para manejar la paginación de datos de manera sencilla.
 
-Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
+## 📂 Estructura del Proyecto
 
-## Build
+La estructura del proyecto sigue las mejores prácticas de modularización de Angular:
 
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory. Use the `--prod` flag for a production build.
+```
+src/
+├── app/
+│   ├── components/          # Componentes reutilizables (si los hubiera)
+│   ├── services/            # Lógica de negocio y comunicación de datos
+│   │   ├── pokemons-service.service.ts  # Servicio principal
+│   │   └── interfaces.ts                # Modelos de datos
+│   ├── pokemons/            # Módulo funcional "Feature Module"
+│   │   ├── pokemons-list/   # Componente para el listado general
+│   │   └── favorites-pokemons/ # Componente para listado de favoritos
+│   ├── app.module.ts        # Módulo raíz
+│   └── app.component.ts     # Componente raíz
+├── assets/                  # Recursos estáticos (imágenes, iconos)
+└── environments/            # Configuraciones de entorno (URLs de API)
+```
 
-## Running unit tests
+## 🧠 Análisis del Código y Decisiones de Diseño
 
-Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
+El código ha sido estructurado para ser mantenible, escalable y fácil de leer. A continuación se detallan las decisiones técnicas más importantes:
 
-## Running end-to-end tests
+### 1. Arquitectura Modular (`PokemonsModule`)
+En lugar de declarar todo en el `AppModule`, se creó un módulo específico `PokemonsModule`.
+- **Por qué:** Esto encapsula toda la funcionalidad relacionada con los Pokémon en un solo lugar, facilitando la carga diferida (lazy loading) si fuera necesario en el futuro y manteniendo el módulo raíz limpio.
 
-Run `ng e2e` to execute the end-to-end tests via [Protractor](http://www.protractortest.org/).
+### 2. Patrón de Servicios (`PokemonsServiceService`)
+Toda la lógica de acceso a datos y gestión de estado se centralizó en `PokemonsServiceService`.
+- **Clases usadas:** `HttpClient` para peticiones web y métodos para manipular `sessionStorage`.
+- **Por qué:** Separación de preocupaciones (Separation of Concerns). Los componentes (`pokemons-list`, `favorites-pokemons`) solo se encargan de la presentación (UI), mientras que el servicio maneja la lógica de negocio "sucia" (llamadas API, parseo de JSON, almacenamiento). Esto hace que los componentes sean ligeros y más fáciles de testear.
 
-## Further help
+### 3. Persistencia con `sessionStorage`
+- **Por qué:** Para un portafolio o demo simple, no siempre se requiere una base de datos backend compleja. Usar `sessionStorage` permite diferenciar una experiencia persistente (no se borra al recargar) sin la complejidad de autenticación y bases de datos reales.
 
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI Overview and Command Reference](https://angular.io/cli) page.
+### 4. Interfaces TypeScript (`IFavorites`)
+- **Por qué:** Se definen contratos claros para los datos. Esto evita errores comunes de tipado y asegura que sabemos exactamente qué propiedades tiene un objeto Pokémon en toda la aplicación.
+
+## 💻 Instalación y Ejecución
+
+Para correr este proyecto localmente:
+
+1. **Instalar dependencias:**
+   ```bash
+   npm install
+   ```
+
+2. **Ejecutar servidor de desarrollo:**
+   ```bash
+   ng serve
+   ```
+   Navega a `http://localhost:4200/`. La aplicación se recargará automáticamente si cambias algún archivo fuente.
+
+3. **Construir para producción:**
+   ```bash
+   ng build
+   ```

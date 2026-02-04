@@ -1,235 +1,807 @@
-body {
-  background: rgb(226, 47, 24) !important;
-  background: radial-gradient(
-    circle,
-    rgba(226, 47, 24, 1) 0%,
-    rgba(83, 71, 64, 1) 100%
-  ) !important;
-  font-family: monospace;
+:root {
+  --poke-red: #ee1515;
+  --poke-dark: #333333;
+  --poke-light: #f0f0f0;
+  --poke-gold: #ffcb05;
+  --poke-blue: #2a75bb;
+  --glass-bg: rgba(255, 255, 255, 0.1);
+  --glass-border: rgba(255, 255, 255, 0.2);
+  --card-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
 }
 
-.icon-actions {
-  font-size: 30px;
+body {
+  background: linear-gradient(135deg, #1a1a1a 0%, #333333 100%) !important;
+  font-family: 'Outfit', 'Inter', sans-serif !important;
+  color: white;
+  min-height: 100vh;
+}
+
+/* Glassmorphism Card */
+.glass-card {
+  background: var(--glass-bg);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--glass-border);
+  border-radius: 20px;
+  box-shadow: var(--card-shadow);
+  transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.3s ease;
+  overflow: hidden;
+}
+
+.glass-card:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 15px 45px rgba(0, 0, 0, 0.5);
+  border-color: var(--poke-red);
+}
+
+/* Pokemon Image Container */
+.poke-img-container {
+  position: relative;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+  padding: 20px;
+  text-align: center;
+}
+
+.poke-img {
+  width: 150px;
+  height: 150px;
+  object-fit: contain;
+  filter: drop-shadow(0 10px 15px rgba(0, 0, 0, 0.5));
+  transition: transform 0.5s ease;
+}
+
+.glass-card:hover .poke-img {
+  transform: scale(1.1) rotate(5deg);
+}
+
+/* Pokeball Button Modern */
+.catch-action {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 10px;
+  transition: transform 0.2s ease;
+}
+
+.catch-action:hover {
+  transform: scale(1.2);
+}
+
+.pokeball-modern {
+  width: 80px;
+  height: 80px;
+  position: relative;
+  background: transparent;
+  transition: transform 0.3s ease;
+  transform-style: preserve-3d;
+  perspective: 500px;
+}
+
+.pokeball-half {
+  position: absolute;
+  width: 100%;
+  height: 50%;
+  left: 0;
+  transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  pointer-events: none;
+}
+
+.pokeball-top {
+  top: 0;
+  background: radial-gradient(circle at 50% 100%, #ff1111, #aa0000 80%);
+  border-radius: 40px 40px 0 0;
+  border-bottom: 2px solid #222;
+  transform-origin: bottom;
+  z-index: 2;
+}
+
+.pokeball-bottom {
+  bottom: 0;
+  background: radial-gradient(circle at 50% 0%, #fff, #ccc 80%);
+  border-radius: 0 0 40px 40px;
+  border-top: 2px solid #222;
+  transform-origin: top;
+  z-index: 1;
+}
+
+.pokeball-inner-button {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 25%;
+  height: 25%;
+  background: radial-gradient(circle, #fff, #888);
+  border: 4px solid #222;
+  border-radius: 50%;
+  transform: translate(-50%, -50%) translateZ(5px);
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.5), 0 0 20px rgba(255, 255, 255, 0.5);
+  z-index: 4;
+}
+
+/* Pac-Man "Eat" States */
+.ball-open .pokeball-top {
+  transform: rotateX(-50deg);
+}
+
+.ball-open .pokeball-bottom {
+  transform: rotateX(50deg);
+}
+
+.ball-eating .pokeball-top {
+  animation: ball-top-chomp 0.3s ease-in forwards;
+}
+
+.ball-eating .pokeball-bottom {
+  animation: ball-bottom-chomp 0.3s ease-in forwards;
+}
+
+@keyframes ball-top-chomp {
+  0% {
+    transform: rotateX(-50deg);
+  }
+
+  100% {
+    transform: rotateX(0deg);
+  }
+}
+
+@keyframes ball-bottom-chomp {
+  0% {
+    transform: rotateX(50deg);
+  }
+
+  100% {
+    transform: rotateX(0deg);
+  }
+}
+
+/* Fix for Black Screen in Modals */
+.pogo-3d-scene {
+  perspective: 1200px;
+  perspective-origin: center center;
+  transform-style: flat !important;
+  /* Force flat on modal container to prevent z-buffer issues with backdrop */
+  background: transparent !important;
+}
+
+.pogo-3d-scene>* {
+  transform-style: preserve-3d;
+}
+
+/* --- AMAZING RARE HOLOGRAPHIC STYLES --- */
+.card-holo {
+  --pointer-x: 50%;
+  --pointer-y: 50%;
+  --card-scale: 1;
+  --card-opacity: 0;
+  --rotate-x: 0deg;
+  --rotate-y: 0deg;
+  --background-x: 50%;
+  --background-y: 50%;
+  --pointer-from-center: 0;
+
+  position: relative;
+  aspect-ratio: var(--card-aspect);
+  border-radius: var(--card-radius);
+  transform-style: preserve-3d;
+  will-change: transform, filter;
+  transition: transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.5s ease;
+  transform: scale(var(--card-scale)) rotateX(var(--rotate-x)) rotateY(var(--rotate-y));
+}
+
+.card-holo.interacting {
+  z-index: 100;
+}
+
+.card__shine,
+.card__glare {
+  position: absolute;
+  inset: 0;
+  border-radius: var(--card-radius);
+  z-index: 10;
+  pointer-events: none;
+  opacity: var(--card-opacity);
+  will-change: transform, opacity, background-position;
+  transition: opacity 0.3s ease;
+}
+
+/* AMAZING RARE SHINE */
+.card-holo[data-rarity="amazing rare"] .card__shine {
+  background-image:
+    var(--glitter),
+    var(--glitter),
+    radial-gradient(farthest-corner circle at var(--pointer-x) var(--pointer-y),
+      hsla(150, 20%, 10%, 0.8) 10%,
+      hsla(177, 22%, 80%, 0.2) 50%,
+      hsla(0, 0%, 95%, 0.5) 90%);
+  background-size: 25% 25%, 25% 25%, cover;
+  background-position: 40% 45%, 55% 55%, center center;
+  background-blend-mode: soft-light, color-burn;
+  filter: brightness(1.2) contrast(1.5) saturate(1.2);
+  mix-blend-mode: color-dodge;
+}
+
+.card-holo[data-rarity="amazing rare"] .card__shine:after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image:
+    repeating-linear-gradient(133deg,
+      var(--sunpillar-1) 0%,
+      var(--sunpillar-2) 5%,
+      var(--sunpillar-3) 10%,
+      var(--sunpillar-4) 15%,
+      var(--sunpillar-5) 20%,
+      var(--sunpillar-6) 25%,
+      var(--sunpillar-1) 30%);
+  background-size: 400% 800%;
+  background-position: var(--background-x) var(--background-y);
+  mix-blend-mode: soft-light;
+  filter: brightness(0.8) contrast(1.2) saturate(1.5);
+  opacity: 0.7;
+}
+
+/* GLARE */
+.card-holo .card__glare {
+  background-image: radial-gradient(farthest-corner circle at var(--pointer-x) var(--pointer-y),
+      hsla(0, 0%, 100%, 0.4) 0%,
+      hsla(0, 0%, 0%, 0.4) 80%);
+  mix-blend-mode: overlay;
+  filter: brightness(1.2) contrast(1.2);
+}
+
+.card-holo:hover,
+.card-holo.interacting {
+  box-shadow:
+    0 0 10px 0px white,
+    0 0 20px 0px var(--card-glow),
+    0 30px 60px -15px rgba(0, 0, 0, 0.5);
+}
+
+.shaking {
+  animation: shake 0.5s cubic-bezier(.36, .07, .19, .97) infinite;
+}
+
+@keyframes shake {
+  0% {
+    transform: rotate(0deg);
+  }
+
+  25% {
+    transform: rotate(-15deg);
+  }
+
+  50% {
+    transform: rotate(0deg);
+  }
+
+  75% {
+    transform: rotate(15deg);
+  }
+
+  100% {
+    transform: rotate(0deg);
+  }
+}
+
+/* Captured State */
+.captured .pokeball-modern {
+  background: var(--poke-gold);
+}
+
+.captured .pokeball-modern::before {
+  background: var(--poke-gold);
+}
+
+/* Typography */
+.poke-title {
+  font-weight: 800;
+  text-transform: capitalize;
+  letter-spacing: 1px;
+  margin: 10px 0;
   color: white;
 }
 
-.icon-actions:hover {
-  color: #000 !important;
+.poke-id {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  font-size: 1.2rem;
+  font-weight: 900;
+  color: rgba(255, 255, 255, 0.2);
 }
 
-.table-striped > tbody > tr:nth-of-type(odd) > * {
-  --bs-table-accent-bg: none;
+/* Search Bar Modern */
+.search-container {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--glass-border);
+  border-radius: 50px;
+  padding: 5px 20px;
+  display: flex;
+  align-items: center;
+  transition: all 0.3s ease;
 }
 
-.icon-pk-captured{
-  background-color: #dc3546d5;
+.search-container:focus-within {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: var(--poke-red);
+  box-shadow: 0 0 15px rgba(238, 21, 21, 0.3);
 }
 
-.icon-actions{
-    padding: 0rem 0.1rem !important;
+.search-input {
+  background: none;
+  border: none;
+  color: white;
+  padding: 10px;
+  width: 100%;
+  outline: none;
 }
 
-.shadow-custom-1 {
-  box-shadow: 5px 5px 37px 7px rgba(0, 0, 0, 0.52);
-}
-
-thead {
-  height: 80px;
-}
-
-.p-15px {
-  padding: 20px;
-}
-
-.px-custom {
-  padding-left: 90px !important;
-}
-
-.px-custom2 {
-  padding-left: 90px !important;
-}
-
-.h-limit {
-  min-width: 561px !important;
-}
-
-.imput-m400{
-  max-width: 400px;
-}
-
-
+/* Custom Scrollbar */
 ::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #1a1a1a;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--poke-red);
+  border-radius: 10px;
+}
+
+/* Modal Modern */
+.modal-content {
+  background: #222 !important;
+  color: white;
+  border: 1px solid var(--glass-border);
+  border-radius: 20px;
+}
+
+.modal-header {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.modal-footer {
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Grid Layout */
+.poke-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 25px;
+  padding: 20px 0;
+}
+
+.pagination-container {
+  margin-top: 40px;
+  display: flex;
+  justify-content: center;
+}
+
+.pagination-controls .ngx-pagination .current {
+  background: var(--poke-red) !important;
+  border-radius: 8px;
+}
+
+.pagination-controls .ngx-pagination a:hover {
+  background: rgba(255, 255, 255, 0.1) !important;
+  border-radius: 8px;
+}
+
+/* 3D Environment */
+.pogo-3d-scene {
+  perspective: 1200px;
+  perspective-origin: center center;
+  transform-style: preserve-3d;
+}
+
+/* Holographic Effect (Shiny/Holo Card style) */
+.holo-container {
+  position: relative;
+  overflow: hidden;
+  border-radius: 15px;
+  transform-style: preserve-3d;
+}
+
+.holo-shine {
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: conic-gradient(from 0deg,
+      transparent,
+      rgba(255, 0, 0, 0.2),
+      rgba(255, 154, 0, 0.2),
+      rgba(208, 222, 33, 0.2),
+      rgba(79, 220, 74, 0.2),
+      rgba(63, 218, 216, 0.2),
+      rgba(47, 201, 226, 0.2),
+      rgba(28, 127, 238, 0.2),
+      rgba(95, 21, 242, 0.2),
+      rgba(186, 12, 248, 0.2),
+      rgba(251, 7, 217, 0.2),
+      rgba(255, 0, 0, 0.2),
+      transparent);
+  mix-blend-mode: color-dodge;
+  opacity: 0;
+  pointer-events: none;
+  z-index: 2;
+  transition: opacity 0.5s ease;
+}
+
+.holo-active .holo-shine {
+  opacity: 1;
+  animation: holo-rotate 4s linear infinite;
+}
+
+@keyframes holo-rotate {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.glare {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(circle at center, rgba(255, 255, 255, 0.4) 0%, transparent 60%);
+  mix-blend-mode: overlay;
+  opacity: 0;
+  z-index: 3;
+}
+
+.holo-active .glare {
+  opacity: 1;
+  animation: glare-move 2s ease-in-out infinite alternate;
+}
+
+@keyframes glare-move {
+  0% {
+    transform: translate(-20%, -20%) scale(1.2);
+  }
+
+  100% {
+    transform: translate(20%, 20%) scale(1.5);
+  }
+}
+
+/* Digital Noise Overlay */
+.digital-noise {
+  position: absolute;
+  inset: 0;
+  background-image: url('https://poke-holo.b-cdn.net/foils/swsh12pt5/masks/upscaled/160_foil_etched_swsecret_2x.webp');
+  background-size: 200px;
+  opacity: 0.1;
+  mix-blend-mode: soft-light;
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* Physical Animation: 3D SWALLOW (Tragar) */
+.poke-swallow {
+  animation: swallow-into-ball 0.8s cubic-bezier(0.6, -0.28, 0.735, 0.045) forwards;
+  transform-style: preserve-3d;
+}
+
+@keyframes swallow-into-ball {
+  0% {
+    transform: scale(1) translateY(0) translateZ(0);
+    opacity: 1;
+  }
+
+  40% {
+    transform: scale(0.6) translateY(50px) translateZ(-100px);
+    opacity: 0.8;
+  }
+
+  100% {
+    transform: scale(0.1) translateY(120px) translateZ(-300px);
+    opacity: 0;
+  }
+}
+
+/* Updated Pac-Man "Eat" Animation - Physical Movement */
+.ball-open-movement {
+  animation: ball-jump-and-open 0.8s ease-in-out forwards;
+}
+
+@keyframes ball-jump-and-open {
+  0% {
+    transform: translateY(0) scale(1);
+  }
+
+  30% {
+    transform: translateY(-100px) scale(1.2);
+  }
+
+  /* Jumps towards pokemon */
+  70% {
+    transform: translateY(-100px) scale(1.2);
+  }
+
+  /* Stays open while eating */
+  100% {
+    transform: translateY(0) scale(1);
+  }
+
+  /* Returns home */
+}
+
+.ball-open-movement .pokeball-top {
+  animation: top-hinge 0.8s ease-in-out forwards;
+}
+
+.ball-open-movement .pokeball-bottom {
+  animation: bottom-hinge 0.8s ease-in-out forwards;
+}
+
+@keyframes top-hinge {
+
+  0%,
+  10% {
+    transform: rotateX(0);
+  }
+
+  30%,
+  60% {
+    transform: rotateX(-110deg);
+  }
+
+  /* Wide open mouth */
+  90%,
+  100% {
+    transform: rotateX(0);
+  }
+}
+
+@keyframes bottom-hinge {
+
+  0%,
+  10% {
+    transform: rotateX(0);
+  }
+
+  30%,
+  60% {
+    transform: rotateX(40deg);
+  }
+
+  /* Slight bottom drop */
+  90%,
+  100% {
+    transform: rotateX(0);
+  }
+}
+
+/* Physical Animation: 3D VOMIT (Expulsar/Vomitar) */
+.poke-vomit {
+  animation: vomit-3d 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+  transform-style: preserve-3d;
+}
+
+@keyframes vomit-3d {
+  0% {
+    transform: scale(0) translateZ(-500px) rotateY(-180deg);
+    opacity: 0;
+    filter: brightness(10) hue-rotate(360deg);
+  }
+
+  45% {
+    transform: scale(1.5, 0.8) translateZ(300px) rotateY(10deg) rotateX(-10deg);
+    opacity: 1;
+    filter: brightness(2) hue-rotate(180deg);
+  }
+
+  75% {
+    transform: scale(0.8, 1.1) translateZ(50px) rotateX(5deg);
+    filter: brightness(1.2) hue-rotate(90deg);
+  }
+
+  100% {
+    transform: scale(1) translateZ(0) rotateY(0);
+    opacity: 1;
+    filter: brightness(1) hue-rotate(0deg);
+  }
+}
+
+/* Pokeball "Belly" Stretch when eating */
+.pokeball-modern.ball-eating {
+  animation: ball-belly 0.4s ease-in-out;
+}
+
+@keyframes ball-belly {
+
+  0%,
+  100% {
+    transform: scale(1);
+  }
+
+  50% {
+    transform: scale(1.2, 0.85) translateZ(50px);
+  }
+
+  /* Bulge out */
+}
+
+/* Realistic Ball Shaking (Pokemon GO style) */
+.pokeball-modern.pogo-shake {
+  animation: pogo-shake 1.5s ease-in-out infinite;
+}
+
+@keyframes pogo-shake {
+
+  0%,
+  100% {
+    transform: rotate(0deg);
+  }
+
+  10%,
+  30%,
+  50% {
+    transform: rotate(-15deg);
+  }
+
+  20%,
+  40%,
+  60% {
+    transform: rotate(15deg);
+  }
+
+  70% {
+    transform: rotate(0deg);
+  }
+}
+
+/* Success Sparkles */
+.sparkle {
+  position: absolute;
   width: 10px;
   height: 10px;
-}
-::-webkit-scrollbar-track {
-  -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.87);
-  border-radius: 10px;
-  background-color: rgba(0, 0, 0, 0.239);
-}
-::-webkit-scrollbar-thumb {
-  border-radius: 10px;
-  background-color: #dc3545;
-  -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.5);
+  background: var(--poke-gold);
+  clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+  opacity: 0;
 }
 
-*:before,
-*:after {
-  -webkit-box-sizing: border-box;
-  -moz-box-sizing: border-box;
-  box-sizing: border-box;
+.animate-sparkles .sparkle {
+  animation: sparkle-fly 0.8s ease-out forwards;
 }
 
-.logo-poke {
-  position: relative;
-  top: -78%;
-  left: 147%;
-  transform: translate(-50%, -50%);
-}
-
-.pokeball {
-  position: absolute;
-  width: 100px;
-  height: 100px;
-  background: #fff;
-  border: 5px solid #000;
-  border-radius: 50%;
-  overflow: hidden;
-  box-shadow: inset -10px 10px 0 10px #ccc;
-  animation: fall 0.25s ease-in-out,
-    shake 1.25s cubic-bezier(0.36, 0.07, 0.19, 0.97) 3;
-}
-
-.pokeball::before,
-.pokeball::after {
-  content: "";
-  position: absolute;
-}
-.pokeball::before {
-  background: red;
-  width: 100%;
-  height: 50%;
-}
-.pokeball::after {
-  top: calc(50% - 3px);
-  width: 100%;
-  height: 3px;
-  background: #000;
-}
-.pokeball__button {
-  position: absolute;
-  top: calc(59% - 20px);
-  left: calc(59% - 20px);
-  width: 30px;
-  height: 30px;
-  background: #7f8c8d;
-  border: 5px solid #fff;
-  border-radius: 50%;
-  z-index: 10;
-  box-shadow: 0 0 0 6px black;
-}
-
-.logo-poke2 {
-  position: absolute;
-  top: 10%;
-  left: 200%;
-  transform: translate(-50%, -50%);
-}
-
-.pokeball2 {
-  position: relative;
-  width: 60px;
-  height: 60px;
-  background: #fff;
-  border: 4px solid #000;
-  border-radius: 50%;
-  overflow: hidden;
-  box-shadow: inset -10px 10px 0 10px #ccc;
-}
-
-.pokeball2:hover {
-  animation: fall2 1s ease-in-out,
-    shake2 0.9s cubic-bezier(0.36, 0.07, 0.19, 0.97) infinite;
-}
-
-.pokeball2::before,
-.pokeball2::after {
-  content: "";
-  position: absolute;
-}
-.pokeball2::before {
-  background: red;
-  width: 100%;
-  height: 50%;
-}
-.pokeball2::after {
-  top: calc(50% - 3px);
-  width: 100%;
-  height: 3px;
-  background: #000;
-}
-.pokeball__button2 {
-  position: absolute;
-  top: calc(89% - 30px);
-  left: calc(63% - 17px);
-  width: 20px;
-  height: 20px;
-  background: #7f8c8d;
-  border: 4px solid #fff;
-  border-radius: 50%;
-  z-index: 10;
-  box-shadow: 0 0 0 3px black;
-}
-.pokeball2-active{
-  background: #eabe3f;
-  box-shadow: inset -10px 10px 0 10px #997d27;
-}
-
-.pokeball2-active::before {
-  background: #eabe3f;
-}
-
-.pokeball2-active:hover {
-  animation: none, shake2 0;
-}
-@keyframes fall {
+@keyframes sparkle-fly {
   0% {
-    top: -200px;
+    transform: scale(0) translate(0, 0);
+    opacity: 1;
   }
-  60% {
-    top: 0;
-  }
-  80% {
-    top: -20px;
-  }
+
   100% {
-    top: 0;
+    transform: scale(1) translate(var(--tx), var(--ty));
+    opacity: 0;
   }
 }
 
-@keyframes shake2 {
+/* Flash effect */
+.poke-flash {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  background: white;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 10;
+  pointer-events: none;
+}
+
+.poke-flash.active {
+  animation: flash-burst 0.5s ease-out;
+}
+
+@keyframes flash-burst {
   0% {
-    transform: translate(0, 0) rotate(0);
+    width: 0;
+    height: 0;
+    opacity: 1;
   }
-  20% {
-    transform: translate(-10px, 0) rotate(-20deg);
+
+  100% {
+    width: 400px;
+    height: 400px;
+    opacity: 0;
   }
-  30% {
-    transform: translate(10px, 0) rotate(20deg);
+}
+
+/* Pokeball Success Glow */
+.pokeball-modern.captured.success-glow {
+  box-shadow: 0 0 30px var(--poke-gold);
+  border-color: var(--poke-gold);
+}
+
+/* Release Animation */
+.release-animation {
+  animation: pop-out 0.8s ease-out forwards;
+}
+
+@keyframes pop-out {
+  0% {
+    transform: scale(0.1);
+    opacity: 0;
+    filter: brightness(5);
   }
+
   50% {
-    transform: translate(-10px, 0) rotate(-10deg);
+    transform: scale(1.2) translateY(-20px);
+    opacity: 1;
+    filter: brightness(2);
   }
-  60% {
-    transform: translate(10px, 0) rotate(10deg);
-  }
+
   100% {
-    transform: translate(0, 0) rotate(0);
+    transform: scale(1) translateY(0);
+    opacity: 1;
+    filter: brightness(1);
   }
 }
 
-@media (max-width: 600px) {
-  .p-5 {
-    padding: 0 !important;
+/* Success Catch Animation */
+.gotcha-text {
+  animation: gotcha 1s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+  font-family: 'Pokemon Solid', sans-serif;
+  color: var(--poke-gold);
+  text-shadow: 0 0 10px rgba(255, 203, 5, 0.5);
+  font-size: 3rem;
+  font-weight: 900;
+}
+
+@keyframes gotcha {
+  0% {
+    transform: scale(0);
+    opacity: 0;
+  }
+
+  70% {
+    transform: scale(1.2);
+    opacity: 1;
+  }
+
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* Light Beam effect on release */
+.light-beam {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 10px;
+  height: 10px;
+  background: white;
+  border-radius: 50%;
+  box-shadow: 0 0 50px 20px white;
+  animation: explode 0.8s ease-out forwards;
+}
+
+@keyframes explode {
+  0% {
+    width: 10px;
+    height: 10px;
+    opacity: 1;
+  }
+
+  100% {
+    width: 300px;
+    height: 300px;
+    opacity: 0;
   }
 }

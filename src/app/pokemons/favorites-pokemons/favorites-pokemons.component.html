@@ -1,108 +1,165 @@
-<div class="row gutter-t gutter-b p-5 h-limit ">
-    <div class="card card-custom shadow">
-        <div class="card-header mt-4 mx-3 header-color bg-dark shadow-custom-1">
-            <div class="my-3 d-flex flex-wrap  justify-content-between">
-                <div class="card-title align-items-center mx-5">
-                    <i class="flaticon-etiqueta icon-2x text-primary mr-3"></i>
-                    <h2 class="poke-text m-0 title-text"><img src="assets/svg/pokemon-23.svg" alt="" class="img-fluid">
-                    </h2>
-                    <div class="logo-poke">
-                        <div class="pokeball">
-                            <div class="pokeball__button"></div>
+<div class="container-fluid p-5">
+    <!-- Header Section -->
+    <div class="glass-card p-4 mb-5">
+        <div class="d-flex flex-wrap justify-content-between align-items-center gap-4">
+            <div class="d-flex align-items-center gap-3">
+                <i class="uil uil-heart fs-1 text-warning"></i>
+                <h1 class="m-0 display-6 fw-bold">Mis <span class="text-warning">Favoritos</span></h1>
+            </div>
+
+            <div class="flex-grow-1 mx-md-5" style="max-width: 500px;">
+                <div class="search-container">
+                    <i class="uil uil-search fs-4 text-secondary"></i>
+                    <input class="search-input" type="text" placeholder="Busca entre tus favoritos..."
+                        [(ngModel)]="searchKey" (keyup.enter)="searchOn()">
+                    <button class="btn btn-warning rounded-pill px-4" (click)="searchOn()">BUSCAR</button>
+                </div>
+            </div>
+
+            <button [routerLink]="['/']" class="btn btn-outline-danger rounded-pill px-4 py-2 fw-bold">
+                <i class="uil uil-arrow-left me-2"></i> Volver a la Lista
+            </button>
+        </div>
+    </div>
+
+    <!-- Empty State -->
+    <div *ngIf="favorites.length === 0" class="text-center py-5">
+        <div class="pokeball-modern mx-auto mb-4" style="width: 100px; height: 100px; opacity: 0.3;"></div>
+        <h2 class="text-secondary">Aún no has capturado ningún Pokémon...</h2>
+        <button [routerLink]="['/']" class="btn btn-danger mt-3 rounded-pill px-4">¡Ir a capturar!</button>
+    </div>
+
+    <!-- Favorites Grid -->
+    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-5 mt-3">
+        <div class="col" *ngFor="let pokemon of favorites | paginate: { itemsPerPage: 12, currentPage: p }">
+            <div class="pokemon-card glass-card h-100 border-0 p-0 position-relative animate-card" appHoloCard>
+
+                <!-- Holo layers -->
+                <div class="card__shine"></div>
+                <div class="card__glare"></div>
+
+                <div class="card-body p-4 text-center">
+                    <span class="poke-id">#{{pokemon.id}}</span>
+                    <div class="poke-img-container my-4">
+                        <img [src]="pokemon.image" [alt]="pokemon.name" class="img-fluid drop-shadow"
+                            style="max-height: 160px;">
+                    </div>
+                    <h3 class="poke-title text-capitalize fw-bold">{{pokemon.name}}</h3>
+
+                    <div class="badge bg-warning text-dark px-3 py-2 rounded-pill mb-3">
+                        <i class="uil uil-star me-1"></i> {{pokemon.alias}}
+                    </div>
+
+                    <div class="mt-2">
+                        <div class="pokeball-modern mx-auto captured">
+                            <div class="pokeball-half pokeball-top"></div>
+                            <div class="pokeball-half pokeball-bottom"></div>
+                            <div class="pokeball-inner-button"></div>
                         </div>
                     </div>
+
+                    <div class="d-flex justify-content-center gap-3 mt-4">
+                        <button (click)="getFavorite(pokemon)"
+                            class="btn btn-outline-light btn-sm rounded-pill px-3 shadow-sm"
+                            style="z-index: 20; position: relative;" data-bs-toggle="modal"
+                            data-bs-target="#editFavoritePokemon">
+                            <i class="uil uil-edit-alt me-1"></i> Editar
+                        </button>
+                        <button (click)="deleteFavorite(pokemon)"
+                            class="btn btn-outline-danger btn-sm rounded-pill px-3 shadow-sm"
+                            style="z-index: 20; position: relative;" data-bs-toggle="modal"
+                            data-bs-target="#releaseModal">
+                            <i class="uil uil-trash-alt me-1"></i> Liberar
+                        </button>
+                    </div>
                 </div>
-                <div class="card-toolbar m-auto px-custom mx-5">
-                    <button [routerLink]="['/']" type="button"
-                        class="btn btn-outline-warning shadow-custom-1 p-15px">
-                        Lista de Pokémons
+            </div>
+        </div>
+    </div>
+
+    <!-- Pagination -->
+    <div class="pagination-container mt-5 text-center" *ngIf="favorites.length > 12">
+        <pagination-controls class="pagination-controls" previousLabel="Anterior" nextLabel="Siguiente"
+            (pageChange)="p = $event"></pagination-controls>
+    </div>
+</div>
+
+<!-- Modal: Edit Alias -->
+<div class="modal fade" id="editFavoritePokemon" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content overflow-hidden">
+            <div class="modal-header border-0 bg-dark py-3">
+                <h5 class="modal-title fw-bold">Cambiando el alias de {{favoriteForm.value.name}}</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                    aria-label="Close"></button>
+            </div>
+
+            <div class="modal-body p-4 text-center">
+                <div class="row align-items-center">
+                    <div class="col-5">
+                        <img [src]="favoriteForm.value.image" class="img-fluid drop-shadow" style="max-height: 150px;">
+                    </div>
+                    <div class="col-7 text-start">
+                        <form [formGroup]="favoriteForm">
+                            <label class="form-label text-secondary small text-uppercase fw-bold">Nuevo Apodo</label>
+                            <input class="form-control bg-dark border-secondary text-white p-3" formControlName="alias"
+                                placeholder="Ej: Rayito..." type="text">
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-footer border-0 p-4">
+                <button id="btn-close-model" class="btn btn-link text-secondary text-decoration-none"
+                    data-bs-dismiss="modal" (click)="resetForm()">Cancelar</button>
+                <button [disabled]="favoriteForm.invalid"
+                    class="btn btn-warning px-5 py-3 rounded-pill fw-bold shadow text-dark"
+                    (click)="editFavoriteAlias()">GUARDAR CAMBIOS</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal: Release Pokemon -->
+<div class="modal fade" id="releaseModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content text-center overflow-hidden">
+            <div class="modal-body p-5 pogo-3d-scene">
+                <div class="position-relative mb-4" style="min-height: 200px;">
+                    <div class="light-beam" *ngIf="isVomiting"></div>
+
+                    <!-- Holographic Wrapper for Releasing -->
+                    <div class="holo-container mx-auto" [class.holo-active]="isVomiting" style="max-width: 200px;">
+                        <div class="holo-shine"></div>
+                        <div class="glare"></div>
+                        <div class="digital-noise"></div>
+
+                        <img [src]="selectedPokemonForRelease?.image" class="img-fluid" [class.poke-vomit]="isVomiting"
+                            style="max-height: 200px;">
+                    </div>
+                </div>
+
+                <!-- Animated Pokeball in Modal -->
+                <div class="mt-4">
+                    <div class="pokeball-modern mx-auto" [class.ball-open]="isVomiting"
+                        style="width: 80px; height: 80px;">
+                        <div class="pokeball-half pokeball-top"></div>
+                        <div class="pokeball-half pokeball-bottom"></div>
+                        <div class="pokeball-inner-button"></div>
+                    </div>
+                </div>
+                <h2 class="fw-bold mb-3">¿Liberar a {{selectedPokemonForRelease?.name}}?</h2>
+                <p class="text-secondary">Volverá a su hábitat natural en la naturaleza.</p>
+
+                <div class="d-flex justify-content-center gap-3 mt-5">
+                    <button class="btn btn-outline-light rounded-pill px-5" data-bs-dismiss="modal"
+                        [disabled]="isVomiting">Mantener</button>
+                    <button class="btn btn-danger rounded-pill px-5 fw-bold" (click)="confirmRelease()"
+                        [disabled]="isVomiting">
+                        {{ isVomiting ? 'VOMITANDO...' : 'SÍ, LIBERAR' }}
                     </button>
                 </div>
-                
-            </div>
-            <div class="row">
-                <div class="col-md-8">
-                    <div class="input-group ms-5 imput-m400">
-                        <input class="form-control search-bar" type="text" placeholder="Busca un Pokémon" aria-label="Search" [(ngModel)]="searchKey" (keyup.enter)="searchOn()">
-                        <div class="input-group-append ">
-                            <button type="button"
-                            class="btn btn-outline-warning shadow-custom-1 pl-3" (click)="searchOn()">
-            
-                                BUSCAR
-                            </button>
-                            
-                        </div>
-                    </div>
-                </div>
-                <br>
-                <br>
-                <br>
-            </div>
-        </div>
-        <div class="card-body py-0">
-            <div class="table-responsive">
-                <table class="table table-striped mt-3 table-vertical-center">
-                    <thead class="table-dark">
-                        <tr class="">
-                            <th class="text-center ">Secuencia</th>
-                            <th class="text-center">Nombre</th>
-                            <th class="text-center">Alias</th>
-                            <th class="text-center">Fecha</th>
-                            <th class="text-center">Acciones</th>
-                        </tr>
-                    </thead>
-
-                    <tbody>
-                        <tr class="align-middle" *ngFor="let pokemon of (favorites | paginate: { itemsPerPage: 10, currentPage: p }); let i = index">
-                            <td class="text-center text-secondary h5"> {{i}}</td>
-                            <td class="text-center text-secondary h5">{{pokemon.name}}</td>
-                            <td class="text-center text-secondary h5">{{pokemon.alias}}</td>
-                            <td class="text-center text-secondary h5">{{pokemon.createdAt | date}}</td>
-                            <td class="d-flex justify-content-center">
-                                <div class="d-flex gap-2 justify-content-center">
-                                    <a  (click)="getFavorite(pokemon)" type="button" class="icon-actions btn btn-warning" data-bs-toggle="modal" data-bs-target="#editFavoritePokemon">
-                                        <i class="uil uil-edit-alt"></i>
-                                    </a>
-                                    <a (click)="deleteFavorite(pokemon)" type="button" class="icon-actions btn btn-danger " data-bs-toggle="tooltip"
-                                        data-bs-placement="top" title="Eliminar">
-                                        <i class="uil uil-trash"></i>
-                                    </a>
-                                </div>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-                <div class="d-flex justify-content-end align-items-center flex-wrap">
-                    <pagination-controls previousLabel="<<"
-                    nextLabel=">>" (pageChange)="p = $event"></pagination-controls>
-                </div>
             </div>
         </div>
     </div>
-</div>
-<div class="modal fade" id="editFavoritePokemon" tabindex="-1" aria-labelledby="exampleModalLabel"
-aria-hidden="true">
-<div class="modal-dialog">
-    <div class="modal-content">
-        <div class="modal-header bg-dark">
-            <h5 class="modal-title text-white m-0 title-text fs-3" id="exampleModalLabel">Edita el alias de
-                {{favoriteForm.value.name}}</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal"
-                aria-label="Close"></button>
-        </div>
-        <div class="modal-body">
-            <form [formGroup]="favoriteForm">
-                <label for="aliasInput" class="form-label">Digita el nuevo alias</label>
-                <input class="form-control" formControlName="alias" id="aliasInput"
-                    placeholder="Alias..." type="text">
-                    <span *ngIf="isInvalid" class="font-weight-bold text-danger">Este campo es obligatorio</span>
-            </form>
-        </div>
-        <div class="modal-footer">
-            <button id="btn-close-model" type="button" class="btn btn-secondary" data-bs-dismiss="modal" (click)="resetForm()">Cerrar</button>
-            <button [disabled]="favoriteForm.invalid" type="button" class="btn btn-danger" (click)="editFavoriteAlias()" >Guardar cambios</button>
-        </div>
-        
-    </div>
-</div>
 </div>

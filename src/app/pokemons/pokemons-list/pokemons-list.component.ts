@@ -12,14 +12,22 @@ declare const $: any;
 export class PokemonsListComponent implements OnInit {
   pokemons: IPokemon[] = []
   pokemonsCopy: IPokemon[] = [];
-  isInvalid:boolean = false
+  isInvalid: boolean = false
+  isCaptured: boolean = false;
+  selectedPokemonForRelease: any;
+  isSwallowing: boolean = false;
+  isVomiting: boolean = false;
+  isEating: boolean = false;
+  isOpening: boolean = false;
 
   public p = 1;
   public searchKey;
   public oldSearchKey;
 
   favoriteForm: FormGroup = new FormGroup({
+    id: new FormControl(''),
     name: new FormControl('', Validators.required),
+    image: new FormControl(''),
     alias: new FormControl('', Validators.required),
     createdAt: new FormControl(new Date(), Validators.required),
   });
@@ -55,58 +63,108 @@ export class PokemonsListComponent implements OnInit {
     this.resetForm();
   }
 
- 
+
+  // No changes needed to isReleasing/isSucking here as they are replaced above
 
   deleteFavorite(item) {
+    this.selectedPokemonForRelease = item;
+    this.isVomiting = false;
+  }
 
-    this.favoriteForm.patchValue(item);
+  confirmRelease() {
+    if (!this.selectedPokemonForRelease) return;
 
-    if (confirm('Vas a liberar este pokemon') == true) {
-      let response = this._pokemonService.deleteFromFavorites(this.favoriteForm.controls.name.value);
+    this.isVomiting = true; // Trigger spit out animation
 
+    setTimeout(() => {
+      let response = this._pokemonService.deleteFromFavorites(this.selectedPokemonForRelease.name);
       if (response) {
         this.getFavorites();
-        //alert('Pokemon eliminado')
-
-      } else {
-        console.log('Pokemon no se pudo eliminar')
+        this.closeModal('releaseModal');
       }
-    }
+      this.isVomiting = false;
+    }, 800);
+  }
 
+  handleCardClick(item: IPokemon) {
+    if (item.isFavorite) {
+      this.deleteFavorite(item);
+    } else {
+      this.setFavorite(item);
+    }
   }
 
   setFavorite(item) {
     this.favoriteForm.patchValue(item);
     this.favoriteForm.controls.createdAt.setValue(new Date());
-    console.log(item)
-    console.log(this.favoriteForm.value)
+    this.isCaptured = false;
+    this.isSwallowing = false;
+    this.isOpening = false;
   }
 
-
   saveFavorite() {
-    console.log(this.favoriteForm.value)
-
     if (!this.favoriteForm.valid) {
       this.isInvalid = true
       return;
     }
 
     this.isInvalid = false
-    let response = this._pokemonService.addToFavorites(this.favoriteForm.value);
- 
-     if(response){
-      $('#btn-close-model').click(); 
-       this.getFavorites();
-       //alert('Pokemon Agregado')
-       //this.btnClose.nativeElement.click()
-     }else{
-       alert('Pokemon no se pudo agregar')
-     }
+
+    // Phase 1: Open Pokeball mouth
+    setTimeout(() => {
+      this.isSwallowing = true; // Digital cage active
+
+      // Phase 2: Start sucking (slightly after opening)
+      setTimeout(() => {
+        this.isEating = true; // Chomp / Close mouth
+
+        setTimeout(() => {
+          this.isEating = false;
+
+          // Start shaking after eating
+          setTimeout(() => {
+            let response = this._pokemonService.addToFavorites(this.favoriteForm.value);
+            if (response) {
+              this.isCaptured = true;
+              setTimeout(() => {
+                this.closeModal('addFavoritePokemon');
+                this.getFavorites();
+              }, 2000);
+            } else {
+              alert('Pokemon no se pudo agregar')
+              this.isSwallowing = false;
+            }
+          }, 1500); // Shaking duration
+        }, 400); // Belly stretch / Chomp closing duration
+      }, 300); // Delay so mouth is open before pokemon moves
+    }, 100);
   }
 
-  resetForm(){
+  private closeModal(modalId: string) {
+    const modalElement = document.getElementById(modalId);
+    if (modalElement) {
+      // Use Bootstrap's own method if available, otherwise fallback
+      if ((window as any).bootstrap && (window as any).bootstrap.Modal) {
+        const modal = (window as any).bootstrap.Modal.getInstance(modalElement);
+        if (modal) modal.hide();
+      } else {
+        $(modalElement).modal('hide');
+      }
+      // Force remove backdrop if it stays
+      setTimeout(() => {
+        $('.modal-backdrop').remove();
+        $('body').removeClass('modal-open').css('overflow', '').css('padding-right', '');
+      }, 300);
+    }
+  }
+
+  resetForm() {
     this.isInvalid = false
     this.favoriteForm.reset()
+    this.isSwallowing = false;
+    this.isVomiting = false;
+    this.isCaptured = false;
+    this.isEating = false;
   }
 
   fillData() {
@@ -122,13 +180,13 @@ export class PokemonsListComponent implements OnInit {
     this.fillData();
 
     if (!this.searchKey) {
-      
+
       return;
     }
 
     this.oldSearchKey = this.searchKey;
 
-    this.pokemons = this.pokemons.filter(x=>{
+    this.pokemons = this.pokemons.filter(x => {
       if (x?.name.toLowerCase().trim().includes(this.searchKey.toString().toLowerCase().trim())) {
         return true;
       }

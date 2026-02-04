@@ -11,18 +11,21 @@ declare const $: any;
 })
 export class FavoritesPokemonsComponent implements OnInit {
 
-  favorites:IFavorites[] = []
-  favoritesCopy:IFavorites[] = []
-  isInvalid:boolean = false
+  favorites: IFavorites[] = []
+  favoritesCopy: IFavorites[] = []
+  isInvalid: boolean = false
+  selectedPokemonForRelease: any;
 
   public p = 1;
   public searchKey;
   public oldSearchKey;
 
   favoriteForm: FormGroup = new FormGroup({
-    name: new FormControl('',Validators.required),
+    id: new FormControl(''),
+    name: new FormControl('', Validators.required),
+    image: new FormControl(''),
     alias: new FormControl('', Validators.required),
-    createdAt: new FormControl(new Date(),Validators.required),
+    createdAt: new FormControl(new Date(), Validators.required),
   });
 
   constructor(private _pokemonService: PokemonsServiceService) { }
@@ -31,60 +34,80 @@ export class FavoritesPokemonsComponent implements OnInit {
     this.getFavorites();
   }
 
-  getFavorites(){
+  getFavorites() {
     this.favorites = this._pokemonService.getFavoritesList();
     this.favoritesCopy = [...this.favorites];
   }
 
-  getFavorite(pokemon){
+  getFavorite(pokemon) {
     this.favoriteForm.patchValue(pokemon)
     console.log(this.favoriteForm.value)
   }
 
-  editFavoriteAlias(){
+  editFavoriteAlias() {
     console.log(this.favoriteForm.value)
-    
-    if(!this.favoriteForm.valid){
+
+    if (!this.favoriteForm.valid) {
       this.isInvalid = true
       return;
     }
-    
+
     this.isInvalid = false
     let response = this._pokemonService.editFavorite(this.favoriteForm.get('name').value, this.favoriteForm.get('alias').value);
- 
-     if(response){
-       this.getFavorites();
-       this.resetForm()
-       $('#btn-close-model').click(); 
- 
-     }else{
+
+    if (response) {
+      this.getFavorites();
+      this.resetForm()
+      $('#btn-close-model').click();
+
+    } else {
       alert('Pokemon no se pudo editar')
-     }
+    }
   }
 
-  resetForm(){
-    
+  resetForm() {
+
     this.favoriteForm.reset()
   }
 
-  deleteFavorite(item){
+  isVomiting: boolean = false;
+  isSwallowing: boolean = false;
+  isEating: boolean = false;
 
-    this.favoriteForm.patchValue(item);
+  deleteFavorite(item) {
+    this.selectedPokemonForRelease = item;
+    this.isVomiting = false;
+  }
 
-    if (confirm('Este pokemon se va a eliminar de tu lista de favoritos') == true) {      
-      let response = this._pokemonService.deleteFromFavorites(this.favoriteForm.controls.name.value);
-  
-      if(response){
+  confirmRelease() {
+    if (!this.selectedPokemonForRelease) return;
+
+    this.isVomiting = true; // Trigger spit out animation
+
+    setTimeout(() => {
+      let response = this._pokemonService.deleteFromFavorites(this.selectedPokemonForRelease.name);
+      if (response) {
         this.getFavorites();
-  
-      }else{
-        console.log('Pokemon no se pudo eliminar')
+        this.closeModal('releaseModal');
       }
-    }
-    else{
-      return
-    }
+      this.isVomiting = false;
+    }, 800);
+  }
 
+  private closeModal(modalId: string) {
+    const modalElement = document.getElementById(modalId);
+    if (modalElement) {
+      if ((window as any).bootstrap && (window as any).bootstrap.Modal) {
+        const modal = (window as any).bootstrap.Modal.getInstance(modalElement);
+        if (modal) modal.hide();
+      } else {
+        $(modalElement).modal('hide');
+      }
+      setTimeout(() => {
+        $('.modal-backdrop').remove();
+        $('body').removeClass('modal-open').css('overflow', '').css('padding-right', '');
+      }, 300);
+    }
   }
 
   fillData() {
@@ -100,13 +123,13 @@ export class FavoritesPokemonsComponent implements OnInit {
     this.fillData();
 
     if (!this.searchKey) {
-      
+
       return;
     }
 
     this.oldSearchKey = this.searchKey;
 
-    this.favorites = this.favorites.filter(x=>{
+    this.favorites = this.favorites.filter(x => {
       if (x?.name.toLowerCase().trim().includes(this.searchKey.toString().toLowerCase().trim())) {
         return true;
       }

@@ -6,12 +6,14 @@ import { PokemonsListComponent } from './pokemons-list/pokemons-list.component';
 import { FavoritesPokemonsComponent } from './favorites-pokemons/favorites-pokemons.component';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { NgxPaginationModule } from 'ngx-pagination';
+import { HoloCardDirective } from './directives/holo-card/holo-card.directive';
 
 
 @NgModule({
   declarations: [
     PokemonsListComponent,
-    FavoritesPokemonsComponent
+    FavoritesPokemonsComponent,
+    HoloCardDirective
   ],
   imports: [
     CommonModule,

@@ -6,7 +6,6 @@ import { BrowserModule } from '@angular/platform-browser';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
-import { PokemonsModule } from './pokemons/pokemons.module';
 
 @NgModule({
   declarations: [
@@ -18,7 +17,6 @@ import { PokemonsModule } from './pokemons/pokemons.module';
     FormsModule,
     ReactiveFormsModule,
     AppRoutingModule,
-    PokemonsModule,
     HttpClientModule
   ],
   providers: [],

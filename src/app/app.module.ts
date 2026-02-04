@@ -7,6 +7,7 @@ import { BrowserModule } from '@angular/platform-browser';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { PokemonsModule } from './pokemons/pokemons.module';
+import { NgxPaginationModule } from 'ngx-pagination';
 
 @NgModule({
   declarations: [
@@ -19,7 +20,8 @@ import { PokemonsModule } from './pokemons/pokemons.module';
     ReactiveFormsModule,
     AppRoutingModule,
     HttpClientModule,
-    PokemonsModule
+    PokemonsModule,
+    NgxPaginationModule
   ],
   providers: [],
   bootstrap: [AppComponent]

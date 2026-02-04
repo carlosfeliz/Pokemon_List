@@ -15,7 +15,7 @@ Este es un proyecto de portafolio desarrollado en **Angular** que permite a los 
 ## 🛠️ Tecnologías y Herramientas Utilizadas
 El proyecto está construido sobre un stack moderno de desarrollo web:
 
-- **Angular (v11):** Framework principal para la estructura SPA (Single Page Application).
+- **Angular (v17):** Framework principal actualizado para la estructura SPA (Single Page Application).
 - **TypeScript:** Lenguaje principal para la lógica de negocio, ofreciendo tipado estático y mayor robustez.
 - **RxJS:** Manejo de flujos de datos asíncronos (Observables), especialmente para las peticiones HTTP.
 - **HTML5 & CSS3:** Maquetación y estilos de la interfaz de usuario.
@@ -28,7 +28,6 @@ La estructura del proyecto sigue las mejores prácticas de modularización de An
 ```
 src/
 ├── app/
-│   ├── components/          # Componentes reutilizables (si los hubiera)
 │   ├── services/            # Lógica de negocio y comunicación de datos
 │   │   ├── pokemons-service.service.ts  # Servicio principal
 │   │   └── interfaces.ts                # Modelos de datos
